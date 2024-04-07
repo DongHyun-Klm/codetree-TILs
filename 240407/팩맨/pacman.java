@@ -118,7 +118,7 @@ public class Main {
 				monster now = al.get(i);
 				if(now.r == pack_r && now.c == pack_c) {
 					al.remove(i);
-					dumy[now.r][now.c] = 2;
+					dumy[now.r][now.c] = 3;
 					i--;
 				}
 			}
