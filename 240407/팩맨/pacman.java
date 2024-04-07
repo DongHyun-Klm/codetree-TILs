@@ -2,7 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
@@ -101,11 +101,7 @@ public class Main {
 		});
 		
 		for (int i = 0; i < 4; i++) {
-			int[][] copy = new int[4][4];
-			for (int j = 0; j < 4; j++) {
-				copy[j] = mon[j].clone();
-			}
-			rec(pack_r, pack_c, i, 0, "", pq, copy);
+			rec(pack_r, pack_c, i, 0, "", pq, mon);
 		}
 		
 		char[] route = pq.poll().dir.toCharArray();
@@ -113,9 +109,14 @@ public class Main {
 			int d = c - '0';
 			pack_r += dir2[d][0];
 			pack_c += dir2[d][1];
-			
+			// 여기 최적화
+			Collections.sort(al, (a,b) -> {
+				if(a.r == b.r) return a.c - b.c;
+				else return a.r - b.r;
+			});
 			for (int i = 0; i < al.size(); i++) {
 				monster now = al.get(i);
+				if(now.r > pack_r || (now.r == pack_r && now.c > pack_c)) break;
 				if(now.r == pack_r && now.c == pack_c) {
 					al.remove(i);
 					dumy[now.r][now.c] = 3;
