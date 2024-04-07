@@ -114,7 +114,14 @@ public class Main {
 				if(a.r == b.r) return a.c - b.c;
 				else return a.r - b.r;
 			});
-			for (int i = 0; i < al.size(); i++) {
+			
+			int left = 0, right = al.size()-1;
+			while(right > left) {
+				int mid = (left + right) / 2;
+				if(al.get(mid).r >= pack_r) right = mid - 1;
+				else left = mid + 1;
+			}
+			for (int i = left; i < al.size(); i++) {
 				monster now = al.get(i);
 				if(now.r > pack_r || (now.r == pack_r && now.c > pack_c)) break;
 				if(now.r == pack_r && now.c == pack_c) {
@@ -123,6 +130,8 @@ public class Main {
 					i--;
 				}
 			}
+			
+			
 		}
 	}
 
