@@ -3,18 +3,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 public class Main {
 	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	static StringTokenizer st;
 	static int m, t, pack_r, pack_c;
+	static ArrayList<Integer>[][] index_arr = new ArrayList[4][4];
 	static int[][] arr = new int[4][4];
 	static int[][] dumy = new int[4][4];
 	static int[][] dir = {{-1,0},{-1,-1},{0,-1},{1,-1},{1,0},{1,1},{0,1},{-1,1}};
 	static int[][] dir2 = {{-1,0},{0,-1},{1,0},{0,1}};
 	static int[][] mon;
+	static Set<Integer> s;
 	static boolean[][] egg;
 	static ArrayList<monster> al = new ArrayList<>();
 	static class info {
@@ -69,13 +73,28 @@ public class Main {
 			
 			// 2. 몬스터 이동
 			mon = new int[4][4];
-			for(monster m : al) {
+			for (int i = 0; i < 4; i++) {
+				for (int j = 0; j < 4; j++) {
+					index_arr[i][j] = new ArrayList<>();
+				}
+			}
+			for(int i=0; i<al.size(); i++) {
+				monster m = al.get(i);
 				m.move();
 				mon[m.r][m.c]++;
+				index_arr[m.r][m.c].add(i);
 			}
 			
 			// 3. 팩맨 이동
+			s = new HashSet<>();
 			pack_move();
+			ArrayList<monster> temp = new ArrayList<>();
+			for(int i=0; i<al.size(); i++) {
+				if(s.contains(i)) continue;
+				temp.add(al.get(i));
+			}
+			al.clear();
+			al = (ArrayList<monster>) temp.clone();
 			
 			// 4. 몬스터 시체 소멸
 			for (int i = 0; i < 4; i++) {
@@ -109,29 +128,10 @@ public class Main {
 			int d = c - '0';
 			pack_r += dir2[d][0];
 			pack_c += dir2[d][1];
-			// 여기 최적화
-			Collections.sort(al, (a,b) -> {
-				if(a.r == b.r) return a.c - b.c;
-				else return a.r - b.r;
-			});
-			
-			int left = 0, right = al.size()-1;
-			while(right > left) {
-				int mid = (left + right) / 2;
-				monster monster = al.get(mid);
-				if(monster.r >= pack_r || (monster.r == pack_r && monster.c >= pack_c)) right = mid - 1;
-				else left = mid + 1;
+			for(int t : index_arr[pack_r][pack_c]) {
+				s.add(t);
+				dumy[pack_r][pack_c] = 3;
 			}
-			for (int i = left; i < al.size(); i++) {
-				monster now = al.get(i);
-				if(now.r > pack_r || (now.r == pack_r && now.c > pack_c)) break;
-				if(now.r == pack_r && now.c == pack_c) {
-					al.remove(i);
-					dumy[now.r][now.c] = 3;
-					i--;
-				}
-			}
-			
 			
 		}
 	}
