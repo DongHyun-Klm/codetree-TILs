@@ -118,7 +118,8 @@ public class Main {
 			int left = 0, right = al.size()-1;
 			while(right > left) {
 				int mid = (left + right) / 2;
-				if(al.get(mid).r >= pack_r) right = mid - 1;
+				monster monster = al.get(mid);
+				if(monster.r >= pack_r || (monster.r == pack_r && monster.c >= pack_c)) right = mid - 1;
 				else left = mid + 1;
 			}
 			for (int i = left; i < al.size(); i++) {
