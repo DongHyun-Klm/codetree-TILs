@@ -71,42 +71,39 @@ public class Main {
 		}
 
 		public void move() {
-			Queue<info> q = new LinkedList<info>();
-			q.add(new info(r, c, ""));
-			boolean[][] visit = new boolean[n][n];
-			visit[r][c] = true;
-			info best = new info(r, c, null);
-			o:
+			Queue<int[]> q = new LinkedList<int[]>();
+			q.add(new int[] {target_r,target_c});
+			int[][] trace = new int[n][n];
+			trace[target_r][target_c] = 1;
+			
 			while(!q.isEmpty()) {
-				info now = q.poll();
+				int[] now = q.poll();
 				for (int k = 0; k < 4; k++) {
-					int nr = now.r + dir[k][0];
-					int nc = now.c + dir[k][1];
+					int nr = now[0] + dir[k][0];
+					int nc = now[1] + dir[k][1];
 					if(nr<0||nc<0||nr>=n||nc>=n) continue;
 					if(road[nr][nc]) continue;
-					if(visit[nr][nc]) continue;
-					if(nr == target_r && nc == target_c) {
-						best = new info(nr, nc, now.rot + k);
-						break o;
-					}
-					q.add(new info(nr, nc, now.rot + k));
-					visit[nr][nc] = true;
+					if(trace[nr][nc]>0) continue;
+					q.add(new int[] {nr,nc});
+					trace[nr][nc] = trace[now[0]][now[1]] + 1;
 				}
 			}
-			int k = best.rot.charAt(0) - '0';
-			r += dir[k][0];
-			c += dir[k][1];
+			
+			int min = Integer.MAX_VALUE, move_r = -1, move_c = -1;
+			for (int i = 0; i < 4; i++) {
+				int nr = r + dir[i][0];
+				int nc = c + dir[i][1];
+				if(nr<0||nc<0||nr>=n||nc>=n) continue;
+				if(trace[nr][nc]==0) continue;
+				if(trace[nr][nc] >= min) continue;
+				min = trace[nr][nc];
+				move_r = nr;
+				move_c = nc;
+			}
+			r = move_r;
+			c = move_c;
 		}
 		
-		static class info {
-			int r, c;
-			String rot;
-			public info(int r, int c, String rot) {
-				this.r = r;
-				this.c = c;
-				this.rot = rot;
-			}
-		}
 	}
 	
     public static void main(String[] args) throws IOException {
