@@ -69,7 +69,8 @@ public class Main {
 			Box box = first;
 			if(box == null) return null;
 			first = box.tail;
-			first.head = null;
+			if(first != null) first.head = null;
+			else last = null;
 			m.remove(box.num);
 			box.tail = null;
 			return box;
