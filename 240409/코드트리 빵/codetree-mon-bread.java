@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -15,7 +16,7 @@ public class Main {
 	static person[] people;
 	static boolean[][] road;
 	static boolean[] arrive;
-	static int[][] dir = {{-1,0},{0,-1},{0,1},{1,0}};
+	static int[][] dir = {{1,0},{0,1},{0,-1},{-1,0}};
 	
 	static class person {
 		int r, c, target_r, target_c;
@@ -28,7 +29,7 @@ public class Main {
 		}
 
 		public void goBase() {
-			PriorityQueue<int[]> q = new PriorityQueue<int[]>((a,b) -> {
+			PriorityQueue<int[]> pq = new PriorityQueue<int[]>((a,b) -> {
 				if(a[0] == b[0]) {
 					if(a[1] == b[1]) {
 						return a[2] - b[2];
@@ -36,10 +37,31 @@ public class Main {
 				} else return a[0] - b[0];
 			});
 			for(int[] b : bases) {
-				int dis = Math.abs(target_r - b[0]) + Math.abs(target_c - b[1]);
-				q.add(new int[] {dis, b[0], b[1]});
+				int dis = 0;
+				Queue<int[]> q = new LinkedList<int[]>();
+				boolean[][] visit = new boolean[n][n];
+				q.add(new int[] {b[0], b[1], 0});
+				o:
+				while(!q.isEmpty()) {
+					int[] now = q.poll();
+					for (int k = 0; k < now.length; k++) {
+						int nr = now[0] + dir[k][0];
+						int nc = now[1] + dir[k][1];
+						if(nr<0||nc<0||nr>=n||nc>=n) continue;
+						if(road[nr][nc]) continue;
+						if(visit[nr][nc]) continue;
+						q.add(new int[] {nr, nc, now[2] + 1});
+						visit[nr][nc] = true;
+						if(nr == target_r && nc == target_c) {
+							dis = now[2] + 1;
+							break o;
+						}
+					}
+				}
+				
+				if(dis != 0) pq.add(new int[] {dis, b[0], b[1]});
 			}
-			int[] target_base = q.poll();
+			int[] target_base = pq.poll();
 			this.r = target_base[1];
 			this.c = target_base[2];
 			for(int i=0; i<bases.size(); i++) {
@@ -91,16 +113,23 @@ public class Main {
     		t++;
     		int move_num = Math.min(t-1, m);
     		for (int i = 1; i <= move_num; i++) {
+    			if(arrive[i]) continue;
     			person now = people[i];
 				// 1. 1칸 움직이기
-    			if(!arrive[i]) now.move();
+    			now.move();
     			
-    			// 2. 도착했다면 멈춤
+    			// 2. 도착했다면 표시해놓기
     			if(now.r == now.target_r && now.c == now.target_c) {
-    				road[now.r][now.c] = true;
     				arrive[i] = true;
     			}
     			
+			}
+    		
+    		// 2. 도착했다면 멈춤
+    		for (int i = 1; i <= m; i++) {
+				if(arrive[i]) {
+					road[people[i].r][people[i].c] = true;
+				}
 			}
     		
     		// 3. t 사람은 베이스캠프 들어가기
