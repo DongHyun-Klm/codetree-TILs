@@ -16,7 +16,7 @@ public class Main {
 	static person[] people;
 	static boolean[][] road;
 	static boolean[] arrive;
-	static int[][] dir = {{1,0},{0,1},{0,-1},{-1,0}};
+	static int[][] dir = {{-1,0},{0,-1},{0,1},{1,0}};
 	
 	static class person {
 		int r, c, target_r, target_c;
@@ -77,9 +77,9 @@ public class Main {
 
 		public void move() {
 			Queue<int[]> q = new LinkedList<int[]>();
-			q.add(new int[] {target_r,target_c});
+			q.add(new int[] {r,c});
 			int[][] trace = new int[n][n];
-			trace[target_r][target_c] = 5;
+			trace[r][c] = 5;
 			o:
 			while(!q.isEmpty()) {
 				int[] now = q.poll();
@@ -87,7 +87,7 @@ public class Main {
 					int nr = now[0] + dir[k][0];
 					int nc = now[1] + dir[k][1];
 					if(nr<0||nc<0||nr>=n||nc>=n) continue;
-					if(nr == r && nc == c) {
+					if(nr == target_r && nc == target_c) {
 						trace[nr][nc] = k+1;
 						break o;
 					}
@@ -97,13 +97,22 @@ public class Main {
 					trace[nr][nc] = k+1;	
 				}
 			}
-			int k = trace[r][c] - 1;
-			if(k==0) k = 3;
-			else if(k==1) k = 2;
-			else if(k==2) k = 1;
-			else k = 0;
-			this.r = r + dir[k][0];
-			this.c = c + dir[k][1];
+			int nr = target_r;
+			int nc = target_c;
+			while(true) {
+				int k = trace[nr][nc] - 1;
+				if(k==0) k = 3;
+				else if(k==1) k = 2;
+				else if(k==2) k = 1;
+				else k = 0;
+				nr += dir[k][0];
+				nc += dir[k][1];
+				if(nr==r && nc==c) {
+					r = nr - dir[k][0];
+					c = nc - dir[k][1];
+					break;
+				}
+			}
 		}
 	}
 	
