@@ -76,42 +76,40 @@ public class Main {
 		}
 
 		public void move() {
-			Queue<int[]> q = new LinkedList<int[]>();
-			q.add(new int[] {r,c});
-			int[][] trace = new int[n][n];
-			trace[r][c] = 5;
+			Queue<info> q = new LinkedList<info>();
+			q.add(new info(r, c, ""));
+			boolean[][] visit = new boolean[n][n];
+			visit[r][c] = true;
+			info best = new info(r, c, null);
 			o:
 			while(!q.isEmpty()) {
-				int[] now = q.poll();
+				info now = q.poll();
 				for (int k = 0; k < 4; k++) {
-					int nr = now[0] + dir[k][0];
-					int nc = now[1] + dir[k][1];
+					int nr = now.r + dir[k][0];
+					int nc = now.c + dir[k][1];
 					if(nr<0||nc<0||nr>=n||nc>=n) continue;
+					if(road[nr][nc]) continue;
+					if(visit[nr][nc]) continue;
 					if(nr == target_r && nc == target_c) {
-						trace[nr][nc] = k+1;
+						best = new info(nr, nc, now.rot + k);
 						break o;
 					}
-					if(road[nr][nc]) continue;
-					if(trace[nr][nc] > 0) continue;
-					q.add(new int[] {nr, nc});
-					trace[nr][nc] = k+1;	
+					q.add(new info(nr, nc, now.rot + k));
+					visit[nr][nc] = true;
 				}
 			}
-			int nr = target_r;
-			int nc = target_c;
-			while(true) {
-				int k = trace[nr][nc] - 1;
-				if(k==0) k = 3;
-				else if(k==1) k = 2;
-				else if(k==2) k = 1;
-				else k = 0;
-				nr += dir[k][0];
-				nc += dir[k][1];
-				if(nr==r && nc==c) {
-					r = nr - dir[k][0];
-					c = nc - dir[k][1];
-					break;
-				}
+			int k = best.rot.charAt(0) - '0';
+			r += dir[k][0];
+			c += dir[k][1];
+		}
+		
+		static class info {
+			int r, c;
+			String rot;
+			public info(int r, int c, String rot) {
+				this.r = r;
+				this.c = c;
+				this.rot = rot;
 			}
 		}
 	}
