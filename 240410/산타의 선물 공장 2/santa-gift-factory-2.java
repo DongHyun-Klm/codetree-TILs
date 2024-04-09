@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
@@ -181,21 +182,33 @@ public class Main {
 			sb.append(to.m.size()).append('\n');
 			return;
 		}
-//		Box from_last = from.last;
-//		Box to_first = to.first; // null인거처리
-//		to_first.head = from_last;
-//		from_last.tail = to.first;
-//		to.first = from.first;
-//		m.p
-		
-		while(!from.m.isEmpty()) {
-			Box last = from.last;
-			from.m.remove(last.num);
-			from.last = last.head;
-			if(from.last != null) from.last.tail = null;
-			to.pushFirst(last);
+		Box from_last = from.last;
+		Box to_first = to.first;
+		Set<Integer> keySet = from.m.keySet();
+		for(int t : keySet) {
+			to.m.put(t, boxMap.get(t));
 		}
+		from.m.clear();
+		if(to_first == null) {
+			to.last = from.last;
+		}
+		else {
+			to_first.head = from_last;
+			from_last.tail = to.first;
+		}
+		to.first = from.first;
 		from.first = null;
+		from.last = null;
+		
+		
+//		while(!from.m.isEmpty()) {
+//			Box last = from.last;
+//			from.m.remove(last.num);
+//			from.last = last.head;
+//			if(from.last != null) from.last.tail = null;
+//			to.pushFirst(last);
+//		}
+//		from.first = null;
 		sb.append(to.m.size()).append('\n');
 	}
 
