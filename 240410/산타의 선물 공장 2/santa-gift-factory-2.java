@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -144,11 +145,16 @@ public class Main {
 			sb.append(to.m.size()).append('\n');
 			return;
 		}
+		Stack<Box> stk = new Stack<Main.Box>();
 		for (int i = 0; i < size/2; i++) {
 			Box first = from.pollFirst();
+			stk.add(first);
 			from.m.remove(first.num);
-			to.pushFirst(first);
 		}
+		while(!stk.isEmpty()) {
+			to.pushFirst(stk.pop());
+		}
+		
 		sb.append(to.m.size()).append('\n');
 	}
 
@@ -175,6 +181,12 @@ public class Main {
 			sb.append(to.m.size()).append('\n');
 			return;
 		}
+//		Box from_last = from.last;
+//		Box to_first = to.first; // null인거처리
+//		to_first.head = from_last;
+//		from_last.tail = to.first;
+//		to.first = from.first;
+//		m.p
 		
 		while(!from.m.isEmpty()) {
 			Box last = from.last;
