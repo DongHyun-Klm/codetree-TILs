@@ -36,32 +36,27 @@ public class Main {
 					} else return a[1] - b[1];
 				} else return a[0] - b[0];
 			});
-			for(int[] b : bases) {
-				int dis = 0;
-				Queue<int[]> q = new LinkedList<int[]>();
-				boolean[][] visit = new boolean[n][n];
-				q.add(new int[] {b[0], b[1], 0});
-				visit[b[0]][b[1]] = true;
-				o:
-				while(!q.isEmpty()) {
-					int[] now = q.poll();
-					for (int k = 0; k < 4; k++) {
-						int nr = now[0] + dir[k][0];
-						int nc = now[1] + dir[k][1];
-						if(nr<0||nc<0||nr>=n||nc>=n) continue;
-						if(road[nr][nc]) continue;
-						if(visit[nr][nc]) continue;
-						q.add(new int[] {nr, nc, now[2] + 1});
-						visit[nr][nc] = true;
-						if(nr == target_r && nc == target_c) {
-							dis = now[2] + 1;
-							break o;
-						}
-					}
+			Queue<int[]> q = new LinkedList<int[]>();
+			int[][] dis = new int[n][n];
+			q.add(new int[] {target_r, target_c});
+			dis[target_r][target_c] = 1;
+			while(!q.isEmpty()) {
+				int[] now = q.poll();
+				for (int k = 0; k < 4; k++) {
+					int nr = now[0] + dir[k][0];
+					int nc = now[1] + dir[k][1];
+					if(nr<0||nc<0||nr>=n||nc>=n) continue;
+					if(road[nr][nc]) continue;
+					if(dis[nr][nc]>0) continue;
+					q.add(new int[] {nr, nc});
+					dis[nr][nc] = dis[now[0]][now[1]] + 1;
 				}
-				
-				if(dis != 0) pq.add(new int[] {dis, b[0], b[1]});
 			}
+			for(int[] b : bases) {
+				int di = dis[b[0]][b[1]];
+				if(di!=0) pq.add(new int[] {di, b[0], b[1]});
+			}
+			
 			int[] target_base = pq.poll();
 			this.r = target_base[1];
 			this.c = target_base[2];
