@@ -41,10 +41,11 @@ public class Main {
 				Queue<int[]> q = new LinkedList<int[]>();
 				boolean[][] visit = new boolean[n][n];
 				q.add(new int[] {b[0], b[1], 0});
+				visit[b[0]][b[1]] = true;
 				o:
 				while(!q.isEmpty()) {
 					int[] now = q.poll();
-					for (int k = 0; k < now.length; k++) {
+					for (int k = 0; k < 4; k++) {
 						int nr = now[0] + dir[k][0];
 						int nc = now[1] + dir[k][1];
 						if(nr<0||nc<0||nr>=n||nc>=n) continue;
