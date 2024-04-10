@@ -21,42 +21,29 @@ public class Main {
 		public Box(int num) {
 			this.num = num;
 		}
-		
-		@Override
-		public String toString() {
-			int hd = 0, tl = 0;
-			if(head != null) hd = head.num;
-			if(tail != null) tl = tail.num;
-			return "Box [num=" + num + ", head=" + hd + ", tail=" + tl + "]";
-		}
-		
 	}
 	
 	static class Belt {
 		Box first, last;
-		Map<Integer, Box> m = new HashMap<Integer, Main.Box>();
+		int size;
 		public Belt(Box first) {
 			this.first = first;
 			this.last = first;
-			m.put(first.num, first);
+			this.size = 1;
 		}
 		public Belt() {
-			
+			this.size = 0;
 		}
 		// 위에 박스 추가
 		public void push(Box box) {
-			m.put(box.num, box);
+			size++;
 			box.head = last;
 			last.tail = box;
 			last = box;
 		}
-		@Override
-		public String toString() {
-			return "Belt [first=" + first + ", last=" + last + ", m=" + m + "]";
-		}
 		
 		public void pushFirst(Box box) {
-			m.put(box.num, box);
+			size++;
 			if(first == null) {
 				this.first = box;
 				this.last = box;
@@ -73,7 +60,7 @@ public class Main {
 			first = box.tail;
 			if(first != null) first.head = null;
 			else last = null;
-			m.remove(box.num);
+			size--;
 			box.tail = null;
 			return box;
 		}
@@ -123,7 +110,7 @@ public class Main {
 
 	private static void getBelt(int b_num) {
 		Belt belt = belts[b_num];
-		int a = -1, b = -1, c = belt.m.size();
+		int a = -1, b = -1, c = belt.size;
 		if(belt.first != null) a = belt.first.num;
 		if(belt.last != null) b = belt.last.num;
 		sb.append(a + 2 * b + 3 * c).append('\n');
@@ -141,29 +128,34 @@ public class Main {
 	private static void divid(int m_src, int m_dst) {
 		Belt from = belts[m_src];
 		Belt to = belts[m_dst];
-		int size = from.m.size();
+		int size = from.size;
 		if(size <= 1) {
-			sb.append(to.m.size()).append('\n');
+			sb.append(to.size).append('\n');
 			return;
 		}
-		Stack<Box> stk = new Stack<Main.Box>();
-		for (int i = 0; i < size/2; i++) {
-			Box first = from.pollFirst();
-			stk.add(first);
-			from.m.remove(first.num);
-		}
-		while(!stk.isEmpty()) {
-			to.pushFirst(stk.pop());
-		}
 		
-		sb.append(to.m.size()).append('\n');
+		from.size -= size/2;
+		to.size += size/2;
+		Box first = from.first;
+		Box last = from.first;
+		for (int i = 1; i < size/2; i++) {
+			last = last.tail;
+		}
+		from.first = last.tail;
+		from.first.head = null;
+		last.tail = to.first;
+		if(to.first != null) to.first.head = last;
+		else to.last = last;
+		to.first = first;
+		
+		sb.append(to.size).append('\n');
 	}
 
 	private static void trade(int m_src, int m_dst) {
 		Belt from = belts[m_src];
 		Belt to = belts[m_dst];
 		if(from.first == null && to.first == null) {
-			sb.append(to.m.size()).append('\n');
+			sb.append(to.size).append('\n');
 			return;
 		}
 		
@@ -172,23 +164,20 @@ public class Main {
 		if(from_first != null) to.pushFirst(from_first);
 		if(to_first != null) from.pushFirst(to_first);
 		
-		sb.append(to.m.size()).append('\n');
+		sb.append(to.size).append('\n');
 	}
 
 	private static void move(int m_src, int m_dst) {
 		Belt from = belts[m_src];
 		Belt to = belts[m_dst];
 		if(from.first == null) {
-			sb.append(to.m.size()).append('\n');
+			sb.append(to.size).append('\n');
 			return;
 		}
 		Box from_last = from.last;
 		Box to_first = to.first;
-		Set<Integer> keySet = from.m.keySet();
-		for(int t : keySet) {
-			to.m.put(t, boxMap.get(t));
-		}
-		from.m.clear();
+		to.size += from.size;
+		from.size = 0;
 		if(to_first == null) {
 			to.last = from.last;
 		}
@@ -201,15 +190,7 @@ public class Main {
 		from.last = null;
 		
 		
-//		while(!from.m.isEmpty()) {
-//			Box last = from.last;
-//			from.m.remove(last.num);
-//			from.last = last.head;
-//			if(from.last != null) from.last.tail = null;
-//			to.pushFirst(last);
-//		}
-//		from.first = null;
-		sb.append(to.m.size()).append('\n');
+		sb.append(to.size).append('\n');
 	}
 
 	private static void input() throws IOException {
