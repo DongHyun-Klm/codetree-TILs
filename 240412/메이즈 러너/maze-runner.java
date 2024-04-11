@@ -24,18 +24,11 @@ public class Main {
 			this.r = r;
 			this.c = c;
 		}
-
-		@Override
-		public String toString() {
-			return "player [r=" + r + ", c=" + c + "]";
-		}
 	}
     public static void main(String[] args) throws IOException {
     	input();
     	while(K-->0) {
     		move();
-    		turn();
-    		
     		boolean flag = true;
     		for (int i = 0; i < M; i++) {
 				if(!arrive[i]) {
@@ -44,6 +37,7 @@ public class Main {
 				}
 			}
     		if(flag) break;
+    		turn();
     	}
     	out_r++;
     	out_c++;
@@ -52,37 +46,34 @@ public class Main {
     }
     
 	private static void turn() {
-		ArrayList<player> copy = new ArrayList<Main.player>();
-		for(int i=0; i<al.size(); i++) {
-			if(arrive[i]) continue;
-			player p = al.get(i);
-			copy.add(new player(p.r, p.c));
-		}
-		Collections.sort(copy, (a,b) -> {
-			if(a.r == b.r) return a.c - b.c;
-			return a.r - b.r;
-		});
-		// 정사각형 한 변의 크기
-		int size = 100, index = -1;
-		for(int i=0; i<copy.size(); i++) {
-			player p = copy.get(i);
-			int dis1 = Math.max(Math.abs(out_r - p.r),Math.abs(out_c - p.c));
-			if(size > dis1) {
-				size = dis1;
-				index = i;
+		int left_r = -1, left_c = -1;
+		int right_r = -1, right_c = -1;
+		// 정사각형 사이즈
+		o:
+		for (int size = 2; size <= N; size++) {
+			// 좌상단 좌표
+			for (int r = 0; r + size - 1 < N; r++) {
+				for (int c = 0; c + size - 1 < N; c++) {
+					boolean exit = false;
+					boolean person = false;
+					// 정사각형 탐색
+					for(int i=r; i<r+size; i++) {
+						for (int j=c; j<c+size; j++) {
+							if(arr[i][j] == -1) exit = true;
+							if(arr[i][j] > 10) person = true;
+						}
+					}
+					if(exit && person) {
+						left_r = r;
+						left_c = c;
+						right_r = r + size -1;
+						right_c = c + size -1;
+						break o;
+					}
+				}
 			}
 		}
-		player p = copy.get(index);
-		int left_r = Math.min(p.r, out_r), left_c = Math.min(p.c, out_c);
-		int right_r = Math.max(p.r, out_r), right_c = Math.max(p.c, out_c);
-		while(!(right_r - left_r == size)) {
-			if(left_r - 1 < 0) right_r++;
-			else left_r--;
-		}
-		while(!(right_c - left_c == size)) {
-			if(left_c - 1 < 0) right_c++;
-			else left_c--;
-		}
+		int size = right_r - left_r;
 		
 		// 회전
 		int[][] temp = new int[size+1][size+1];
@@ -187,7 +178,7 @@ public class Main {
 			int r = Integer.parseInt(st.nextToken()) - 1;
 			int c = Integer.parseInt(st.nextToken()) - 1;
 			al.add(new player(r, c));
-			arr[r][c] = 1<<(i+4);
+			arr[r][c] += 1<<(i+4);
 		}
 		st = new StringTokenizer(br.readLine());
 		out_r = Integer.parseInt(st.nextToken()) - 1;
