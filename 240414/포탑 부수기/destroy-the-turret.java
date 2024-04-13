@@ -51,6 +51,7 @@ public class Main {
         while(K-->0) {
             answer = 0;
             flag_razer = false;
+            towers.clear();
             for(int i=0; i<N; i++) {
                 for(int j=0; j<M; j++) {
                 	if(arr[i][j] != 0) towers.add(new tower(arr[i][j], atk[i][j], i+j, j));
